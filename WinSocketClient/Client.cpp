@@ -1,11 +1,8 @@
 #include "Client.h"
 #pragma warning(disable : 4996)
 #pragma comment(lib, "ws2_32.lib")
-#include <locale>
-#define UNICODE
-Client::Client() {
-	std::locale::global(std::locale(""));
-}
+
+Client::Client() {}
 Client::~Client() {}
 
 bool Client::ClientStart() {
@@ -13,7 +10,6 @@ bool Client::ClientStart() {
 		std::cout << "Client WSAStartup is successful\n";
 		wsprintf(m_LogBuffer, "Client %s is %s", m_WSAData.szDescription, m_WSAData.szSystemStatus);
 		m_WSAData.iMaxUdpDg = 512;
-		
 		std::cout << "iMaxUdpDg size : " << m_WSAData.iMaxUdpDg << " bytes." << std::endl;
 		std::cout << m_LogBuffer << std::endl;
 	}
@@ -54,19 +50,19 @@ void Client::Connect(int port, const char* ipAddress)
 }
 
 bool Client::RecieveFile() {
-	static int sum = 0;
 	static std::streampos position = 0;
+	static int sum = 0;
 	file.seekp(position);
-	long filesize = 706;
-	position = filesize;
-	m_iResult = recv(m_client_socket, recvbuffer, filesize, 0);
+	m_iResult = recv(m_client_socket, recvbuffer, PARTSIZE, 0);
 
 	if (m_iResult > 0) {
-		file.open("picture1.png", std::ios::binary | std::ios::ate | std::ios::out);
+		file.open("picture_test.png", std::ios::binary | std::ios::app | std::ios::out);
 		if (file.is_open()) {
-			file.write(recvbuffer, filesize);
+			if(m_iResult >= PARTSIZE) file.write(recvbuffer, PARTSIZE);
+			else file.write(recvbuffer, m_iResult);
 			file.flush();
 			std::cout << "Recieve bytes : " << m_iResult << std::endl;
+			position += PARTSIZE;
 			sum += m_iResult;
 			file.close();
 		}
@@ -78,6 +74,8 @@ bool Client::RecieveFile() {
 	else if (m_iResult == 0) {
 		std::cout << "Connection is closing." << std::endl;
 		std::cout << "Total bytes : " << sum << std::endl;
+		position = 0;
+		sum = 0;
 		return 0;
 	}
 	else{
