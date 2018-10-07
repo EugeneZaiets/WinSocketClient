@@ -79,16 +79,15 @@ bool Client::RecieveFile() {
 		std::cout << "Connection is closing." << std::endl;
 		std::cout << "Total bytes : " << sum << std::endl;
 		return 0;
-		}
-	else {
+	}
+	else{
 		std::cout << "Recieve is failed. Error :" << WSAGetLastError() << std::endl;
 		return 0;
-		}
+	}
 	return 1;
 }
 
 void Client::Disconnect() {
-	
 	closesocket(m_client_socket);
 	std::cout << "Disconnected.\n";
 	WSACleanup();

@@ -16,7 +16,7 @@ public:
 	Client();
 	~Client();
 	bool ClientStart();
-	void Connect(int port,const char* ipAddress = "localhost");
 	bool RecieveFile();
+	void Connect(int port,const char* ipAddress = "localhost");
 	void Disconnect();
 };
