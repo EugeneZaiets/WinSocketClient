@@ -8,7 +8,6 @@ class Client {
 	WSAData m_WSAData;
 	SOCKET m_client_socket;
 	sockaddr_in m_addr_client;
-	char recvbuffer[512] = "";
 	char m_LogBuffer[256];
 public:
 	int m_iResult;
