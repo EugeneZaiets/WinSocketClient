@@ -12,7 +12,7 @@ class Client {
 	char m_LogBuffer[256];
 public:
 	int m_iResult;
-	std::ofstream* file;
+	std::ofstream file;
 	Client();
 	~Client();
 	bool ClientStart();
