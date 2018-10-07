@@ -8,6 +8,7 @@ class Client {
 	WSAData m_WSAData;
 	SOCKET m_client_socket;
 	sockaddr_in m_addr_client;
+	char recvbuffer[1024] = "";
 	char m_LogBuffer[256];
 public:
 	int m_iResult;
@@ -16,6 +17,6 @@ public:
 	~Client();
 	bool ClientStart();
 	void Connect(int port,const char* ipAddress = "localhost");
-	void RecieveFile();
+	bool RecieveFile();
 	void Disconnect();
 };

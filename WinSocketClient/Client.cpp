@@ -50,31 +50,41 @@ void Client::Connect(int port, const char* ipAddress)
 	else {
 		std::cout << "Connected to Server. IP - " << inet_ntoa(m_addr_client.sin_addr) << "\n";
 	}
-	RecieveFile();
+	while (RecieveFile());
 }
 
-void Client::RecieveFile() {
-	file.open("picture1.png", std::ios::binary | std::ios::out);
-	if (file.is_open()) {
-		long filesize = 706;
-		char recvbuffer[1024] = "";
-		m_iResult = recv(m_client_socket, recvbuffer, filesize, 0);
+bool Client::RecieveFile() {
+	static int sum = 0;
+	static std::streampos position = 0;
+	file.seekp(position);
+	long filesize = 706;
+	position = filesize;
+	m_iResult = recv(m_client_socket, recvbuffer, filesize, 0);
 
-		if (m_iResult > 0) {
+	if (m_iResult > 0) {
+		file.open("picture1.png", std::ios::binary | std::ios::ate | std::ios::out);
+		if (file.is_open()) {
 			file.write(recvbuffer, filesize);
 			file.flush();
 			std::cout << "Recieve bytes : " << m_iResult << std::endl;
+			sum += m_iResult;
+			file.close();
 		}
-		else if (m_iResult == 0) {
-			std::cout << "Connection closed." << std::endl;
-			//std::cout << "Total bytes : " << sum << std::endl;
-			//std::cout << "Recieved Buffer: " << recvbuffer << std::endl;
-			return;
+		else {
+			std::cout << "File didn't open. Error :" << GetLastError() << std::endl;
+			return 0;
 		}
-		else  std::cout << "Recieve is failed. Error :" << WSAGetLastError() << std::endl;
 	}
-	else std::cout << "File didn't open. Error :" << GetLastError() << std::endl;
-	file.close();
+	else if (m_iResult == 0) {
+		std::cout << "Connection is closing." << std::endl;
+		std::cout << "Total bytes : " << sum << std::endl;
+		return 0;
+		}
+	else {
+		std::cout << "Recieve is failed. Error :" << WSAGetLastError() << std::endl;
+		return 0;
+		}
+	return 1;
 }
 
 void Client::Disconnect() {
